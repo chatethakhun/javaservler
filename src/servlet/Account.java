@@ -25,16 +25,29 @@ import com.mongodb.client.MongoDatabase;
 public class Account extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-
+            @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        System.out.println("Doget");
+        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        DB database = mongoClient.getDB("mean");
+        DBCollection collection = database.getCollection("users");
+        DBCursor cursor = collection.find();
+        PrintWriter pw = response.getWriter(); 
+        List<DBObject> myList = null;
+        myList = cursor.toArray();
+        String json = jsonConvert(myList);
+        pw.write(json);
+    }
 
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-    	//response.addHeader("Access-Control-Allow-Origin","*");
-    	//response.addHeader("Access-Control-Allow-Methods"," GET, POST, OPTIONS");
-    	//response.addHeader("Access-Control-Allow-Headers","Content-Type");
+    	response.addHeader("Access-Control-Allow-Origin","*");
+    	response.addHeader("Access-Control-Allow-Methods"," GET, POST, OPTIONS");
+    	response.addHeader("Access-Control-Allow-Headers","Content-Type");
         PrintWriter out = response.getWriter();
         
         String data = readRequestBody(request);
@@ -90,7 +103,7 @@ public class Account extends HttpServlet {
 
 
     
-    protected Object jsonConvert(String data) {
+    protected String jsonConvert(Object data) {
         JSONSerializer serializer = new JSONSerializer();
         return serializer.serialize( data );
     }// </editor-fold>
