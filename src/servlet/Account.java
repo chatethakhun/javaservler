@@ -37,7 +37,7 @@ public class Account extends HttpServlet {
         List<DBObject> myList = null;
         myList = cursor.toArray();
         String json = jsonConvert(myList);
-        pw.write(json);
+        pw.write(myList.toString());
     }
 
 
@@ -45,9 +45,9 @@ public class Account extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-    	response.addHeader("Access-Control-Allow-Origin","*");
-    	response.addHeader("Access-Control-Allow-Methods"," GET, POST, OPTIONS");
-    	response.addHeader("Access-Control-Allow-Headers","Content-Type");
+    	//response.addHeader("Access-Control-Allow-Origin","*");
+    	//response.addHeader("Access-Control-Allow-Methods"," GET, POST, OPTIONS");
+    	//response.addHeader("Access-Control-Allow-Headers","Content-Type");
         PrintWriter out = response.getWriter();
         
         String data = readRequestBody(request);
