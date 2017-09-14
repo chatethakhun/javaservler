@@ -33,12 +33,24 @@ public class Account extends HttpServlet {
         DB database = mongoClient.getDB("mean");
         DBCollection collection = database.getCollection("users");
         DBCursor cursor = collection.find();
+        int countRow = cursor.count();
+        System.out.println(countRow);
         PrintWriter pw = response.getWriter(); 
         List<DBObject> myList = null;
         myList = cursor.toArray();
-        String json = jsonConvert(myList);
-        pw.write(myList.toString());
-    }
+        //String json = jsonConvert(cursor);
+                //System.out.println(json);
+        String page = request.getParameter("page");
+        String sort = request.getParameter("sort");
+        String order = request.getParameter("order");
+        System.out.println(page);
+        System.out.println(sort);
+        System.out.println(order);
+         pw.write("{\"success\":" + "true" + ",\"message\":" + page + "\"}");
+    }  
+    
+      //  pw.write(json);
+    
 
 
     @Override
@@ -72,32 +84,21 @@ public class Account extends HttpServlet {
             Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-
-        System.out.println(firstName);
-        System.out.println(lastName);
-        System.out.println(username);
-        System.out.println(password);
-        System.out.println(email);
-        
-		MongoClient mongo = new MongoClient("localhost", 27017);
-		MongoDatabase db = mongo.getDatabase("mean");
-        MongoCollection<Document> collection = db.getCollection("users");
-        BasicDBObject query = new BasicDBObject();
-        BasicDBObject fields = new BasicDBObject();
-        //fields.put("name", 1);
-        
-        Document document = new Document("firstName", firstName)
-                .append("lastName", lastName)
-                .append("username", username)
-                .append("password", password)
-                .append("email", email);
-
-        collection.insertOne(document);
-        //System.out.println("Success " + id);
-           RequestDispatcher rs = request.getRequestDispatcher("index.html");
-           //rs.include(request, response);
-        PrintWriter pw = response.getWriter();
-        pw.write(data);
+        Users users = new Users();
+        users.setFirstName(firstName);
+        users.setLastName(lastName);
+        users.setUsername(username);
+        users.setPassword(password);
+        users.setEmail(email);
+        MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
+        DB db = mongoClient.getDB( "mean" );
+        DBCollection collection = null ;
+        collection = db.getCollection("users");
+        collection.save(users);
+                   RequestDispatcher rs = request.getRequestDispatcher("index.html");
+                   //rs.include(request, response);
+                PrintWriter pw = response.getWriter();
+                pw.write(data);
         //processRequest(request, response);
     }
 
