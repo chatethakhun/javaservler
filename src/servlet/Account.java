@@ -28,25 +28,31 @@ public class Account extends HttpServlet {
             @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("Doget");
+            	String dataObject = readRequestBody(request);
+            	int curent = Integer.parseInt(request.getParameter("page"));
+                int page = (int) (Math.floor(curent-1)*(Math.sqrt(13) + Math.sqrt(5)));
+	
+                String sort = request.getParameter("sort");
+                String order = request.getParameter("order");
+                int size = Integer.parseInt(request.getParameter("size"));
         MongoClient mongoClient = new MongoClient("localhost", 27017);
         DB database = mongoClient.getDB("mean");
         DBCollection collection = database.getCollection("users");
         DBCursor cursor = collection.find();
         int countRow = cursor.count();
-        System.out.println(countRow);
+        cursor.skip(page).limit(size);
+
+        System.out.println("PageIndex" + page);	
+        System.out.println("CountRow" + size);	
+
         PrintWriter pw = response.getWriter(); 
         List<DBObject> myList = null;
         myList = cursor.toArray();
         //String json = jsonConvert(cursor);
                 //System.out.println(json);
-        String page = request.getParameter("page");
-        String sort = request.getParameter("sort");
-        String order = request.getParameter("order");
-        System.out.println(page);
-        System.out.println(sort);
-        System.out.println(order);
-         pw.write("{\"total_count\":" + countRow + ",\"pageIndex\":" + page +  ",\"items\":" + myList.toString() + "}");
+
+
+         pw.write("{\"total_count\":" + countRow + ",\"pageIndex\":" + page +  ",\"items\":" + myList + "}");
          pw.close();
     }  
     
@@ -119,7 +125,7 @@ public class Account extends HttpServlet {
         while ((line = reader.readLine()) != null) {
             buffer.append(line);
         }
-
+        System.out.println("Buffer" + buffer.toString());
         return buffer.toString();
     } catch (Exception e) {
         System.out.println("Failed to read the request body from the request.");
