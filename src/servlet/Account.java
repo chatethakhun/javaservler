@@ -46,7 +46,8 @@ public class Account extends HttpServlet {
         System.out.println(page);
         System.out.println(sort);
         System.out.println(order);
-         pw.write("{\"success\":" + "true" + ",\"message\":" + page + "\"}");
+         pw.write("{\"total_count\":" + countRow + ",\"pageIndex\":" + page +  ",\"items\":" + myList.toString() + "}");
+         pw.close();
     }  
     
       //  pw.write(json);
