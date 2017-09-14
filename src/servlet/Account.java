@@ -28,22 +28,24 @@ public class Account extends HttpServlet {
             @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            	String dataObject = readRequestBody(request);
-            	int curent = Integer.parseInt(request.getParameter("page"));
-                int page = (int) (Math.floor(curent-1)*(Math.sqrt(13) + Math.sqrt(5)));
-	
-                String sort = request.getParameter("sort");
-                String order = request.getParameter("order");
-                int size = Integer.parseInt(request.getParameter("size"));
+            	
+        String dataObject = readRequestBody(request);
+        int page = Integer.parseInt(request.getParameter("page"));
+        int size = Integer.parseInt(request.getParameter("size"));
+        //int page = (int) (Math.floor(curent-1)*(Math.sqrt(13) + Math.sqrt(5)));
+        String sort = request.getParameter("sort");
+        String order = request.getParameter("order");
+        
         MongoClient mongoClient = new MongoClient("localhost", 27017);
         DB database = mongoClient.getDB("mean");
         DBCollection collection = database.getCollection("users");
         DBCursor cursor = collection.find();
         int countRow = cursor.count();
-        cursor.skip(page).limit(size);
+        int offset = (page -1) * size;
+        cursor.skip(offset).limit(size);
 
-        System.out.println("PageIndex" + page);	
-        System.out.println("CountRow" + size);	
+        System.out.println("PageIndex:" + page);	
+        System.out.println("Page Current:" + offset);	
 
         PrintWriter pw = response.getWriter(); 
         List<DBObject> myList = null;
@@ -91,21 +93,28 @@ public class Account extends HttpServlet {
             Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        Users users = new Users();
-        users.setFirstName(firstName);
-        users.setLastName(lastName);
-        users.setUsername(username);
-        users.setPassword(password);
-        users.setEmail(email);
+        Users user = new Users();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setEmail(email);
+        System.out.println(user.getFirstName());
         MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
         DB db = mongoClient.getDB( "mean" );
         DBCollection collection = null ;
         collection = db.getCollection("users");
-        collection.save(users);
+        BasicDBObject document = new BasicDBObject();
+        document.put("firstName", firstName);
+        document.put("lastName", lastName);
+        document.put("username", username);
+        document.put("password", password);
+        document.put("email", email);
+        collection.insert(document);
                    RequestDispatcher rs = request.getRequestDispatcher("index.html");
                    //rs.include(request, response);
                 PrintWriter pw = response.getWriter();
-                pw.write(data);
+                //pw.write(data);
         //processRequest(request, response);
     }
 
