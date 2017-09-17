@@ -1,0 +1,139 @@
+package servlet;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.MongoClient;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.json.JSONException;
+import org.json.JSONObject;
+import tools.*;
+
+/**
+ *
+ * @author chate
+ */
+public class Validate extends HttpServlet {
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet Validate</title>");            
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet Validate at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
+    }
+    
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+            response.setContentType("application/json");
+            boolean status = false;
+            String message = "";
+            BodyRequest getBody = new BodyRequest();
+            String data = getBody.readRequestBody(request);
+            System.out.println("Data is :" + data);
+        String username = "";
+        String password = "";
+        
+        try {
+            JSONObject json = new JSONObject(data);
+            username = json.getString("username");
+            password = json.getString("password");
+            MongoClient mongoClient = new MongoClient("localhost", 27017);
+            DB database = mongoClient.getDB("mean");
+            DBCollection collection = database.getCollection("users");
+            BasicDBObject whereQuery = new BasicDBObject();
+            whereQuery.put("username", username);
+            DBCursor cursor = collection.find(whereQuery);
+                if(cursor.count() == 0) {
+                    System.out.println("not found");
+                    //status = true;
+                    message = "Login unsuccess";
+                    json.put("status", status);
+                    json.put("message", message);
+                    PrintWriter out = response.getWriter();
+                    out.print(json);
+                
+            }else {
+                    System.out.println("not found");
+                    status = true;
+                    message = "Login success";
+                    json.put("status", status);
+                    json.put("message", message);
+                    PrintWriter out = response.getWriter();
+                    out.print(json);
+                }
+
+
+        } catch (JSONException ex) {
+            Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+}
