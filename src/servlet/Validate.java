@@ -13,6 +13,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -85,16 +87,20 @@ public class Validate extends HttpServlet {
             response.setContentType("application/json");
             boolean status = false;
             String message = "";
+
             BodyRequest getBody = new BodyRequest();
             String data = getBody.readRequestBody(request);
             System.out.println("Data is :" + data);
         String username = "";
         String password = "";
+        String plaintext = "your text here";
+
         
         try {
             JSONObject json = new JSONObject(data);
             username = json.getString("username");
             password = json.getString("password");
+            String token = MD5(username + password + "6+6856sfsdfsdopfjsdfopisdfjsofjosdfpsdijofsdif");
             MongoClient mongoClient = new MongoClient("localhost", 27017);
             DB database = mongoClient.getDB("mean");
             DBCollection collection = database.getCollection("users");
@@ -116,6 +122,7 @@ public class Validate extends HttpServlet {
                     message = "Login success";
                     json.put("status", status);
                     json.put("message", message);
+                    json.put("token", token);
                     PrintWriter out = response.getWriter();
                     out.print(json);
                 }
@@ -135,5 +142,17 @@ public class Validate extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+public String MD5(String md5) {
+   try {
+        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+        byte[] array = md.digest(md5.getBytes());
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < array.length; ++i) {
+          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+       }
+        return sb.toString();
+    } catch (java.security.NoSuchAlgorithmException e) {
+    }
+    return null;
+}
 }
