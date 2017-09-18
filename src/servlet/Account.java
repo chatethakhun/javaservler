@@ -65,57 +65,8 @@ public class Account extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-    	//response.addHeader("Access-Control-Allow-Origin","*");
-    	//response.addHeader("Access-Control-Allow-Methods"," GET, POST, OPTIONS");
-    	//response.addHeader("Access-Control-Allow-Headers","Content-Type");
-        PrintWriter out = response.getWriter();
+        System.out.println("Create");
         
-        String data = readRequestBody(request);
-        String firstName = "";
-        String lastName = "";
-        String username = "";
-        String password = "";
-        String email = "";
-        
-        try {
-            //System.out.println(data);
-            //String pass = request.getParameter("pass");
-            //Object dataJson = jsonConvert(data);
-            JSONObject json = new JSONObject(data);
-
-            firstName = json.getString("firstName");
-            lastName = json.getString("lastName");
-            username = json.getString("username");
-            password = json.getString("password");
-            email = json.getString("email");
-        } catch (JSONException ex) {
-            Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        Users user = new Users();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setEmail(email);
-        System.out.println(user.getFirstName());
-        MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
-        DB db = mongoClient.getDB( "mean" );
-        DBCollection collection = null ;
-        collection = db.getCollection("users");
-        BasicDBObject document = new BasicDBObject();
-        document.put("firstName", firstName);
-        document.put("lastName", lastName);
-        document.put("username", username);
-        document.put("password", password);
-        document.put("email", email);
-        collection.insert(document);
-                   RequestDispatcher rs = request.getRequestDispatcher("index.html");
-                   //rs.include(request, response);
-                PrintWriter pw = response.getWriter();
-                //pw.write(data);
-        //processRequest(request, response);
     }
 
 
