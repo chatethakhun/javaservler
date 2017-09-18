@@ -1,5 +1,5 @@
 package servlet;
-
+import tools.*;
 import flexjson.*;
 import java.io.*;
 import java.util.*;
@@ -66,7 +66,80 @@ public class Account extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         System.out.println("Create");
+        String header = response.getHeader("Authorization");
+        System.out.println(header);
+        boolean status = false;
+        MD5 md5 = new MD5();
+        response.setContentType("text/html;charset=UTF-8");
+    	//response.addHeader("Access-Control-Allow-Origin","*");
+    	//response.addHeader("Access-Control-Allow-Methods"," GET, POST, OPTIONS");
+    	//response.addHeader("Access-Control-Allow-Headers","Content-Type");
+
         
+        String data = readRequestBody(request);
+        String firstName = "";
+        String lastName = "";
+        String username = "";
+        String password = "";
+        String email = "";
+        
+        try {
+            JSONObject json = new JSONObject(data);
+            firstName = json.getString("firstName");
+            lastName = json.getString("lastName");
+            username = json.getString("username");
+            password = json.getString("password");
+            email = json.getString("email");
+        } catch (JSONException ex) {
+            Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String token = md5.MD5("2131354dsffjhsdfhsfjiweofdsfp[" + firstName);
+        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        DB database = mongoClient.getDB("mean");
+        DBCollection collection = database.getCollection("users");
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("username", username);
+        DBCursor cursor = collection.find(whereQuery);
+        System.out.println(cursor.count());
+        if(cursor.count() > 0) {
+            try {
+                JSONObject json = new JSONObject();
+                status = false;
+                String message = "already account";
+                json.put("status", status);
+                json.put("token", token);
+                json.put("message", message);
+                PrintWriter pw = response.getWriter();
+                pw.write(json.toString());
+            } catch (JSONException ex) {
+                Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+                BasicDBObject document = new BasicDBObject();
+        document.put("firstName", firstName);
+        document.put("lastName", lastName);
+        document.put("username", username);
+        document.put("password", password);
+        document.put("email", email);
+        document.put("token", token);
+        collection.insert(document);
+
+
+            try {
+                JSONObject json = new JSONObject();
+                status = true;
+                String message = "insert success";
+                json.put("status", status);
+                json.put("token", token);
+                json.put("message", message);
+                PrintWriter pw = response.getWriter();
+                pw.write(json.toString());
+            } catch (JSONException ex) {
+                Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
+            }}
+
+
+                    RequestDispatcher rs = request.getRequestDispatcher("index.html");
     }
 
 

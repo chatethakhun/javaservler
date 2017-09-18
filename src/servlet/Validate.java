@@ -84,6 +84,7 @@ public class Validate extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+            String header = request.getHeader("Authorization");
             response.setContentType("application/json");
             boolean status = false;
             String message = "";
@@ -93,14 +94,16 @@ public class Validate extends HttpServlet {
             System.out.println("Data is :" + data);
         String username = "";
         String password = "";
-        String plaintext = "your text here";
+        //String token = "";
+        
 
         
         try {
             JSONObject json = new JSONObject(data);
             username = json.getString("username");
             password = json.getString("password");
-            String token = MD5(username + password + "6+6856sfsdfsdopfjsdfopisdfjsofjosdfpsdijofsdif");
+            MD5 md5 = new MD5();
+            String token = "";
             MongoClient mongoClient = new MongoClient("localhost", 27017);
             DB database = mongoClient.getDB("mean");
             DBCollection collection = database.getCollection("users");
@@ -117,7 +120,10 @@ public class Validate extends HttpServlet {
                     out.print(json);
                 
             }else {
-                    System.out.println("not found");
+                    while (cursor.hasNext()) {
+                        BasicDBObject obj = (BasicDBObject) cursor.next();
+                        token = obj.getString("token");
+                    }
                     status = true;
                     message = "Login success";
                     json.put("status", status);
@@ -142,17 +148,5 @@ public class Validate extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-public String MD5(String md5) {
-   try {
-        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-        byte[] array = md.digest(md5.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < array.length; ++i) {
-          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-       }
-        return sb.toString();
-    } catch (java.security.NoSuchAlgorithmException e) {
-    }
-    return null;
-}
+
 }
