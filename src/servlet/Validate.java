@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -108,29 +110,38 @@ public class Validate extends HttpServlet {
             DB database = mongoClient.getDB("mean");
             DBCollection collection = database.getCollection("users");
             BasicDBObject whereQuery = new BasicDBObject();
-            whereQuery.put("username", username);
+            List<BasicDBObject> objDB = new ArrayList<BasicDBObject>();
+            objDB.add(new BasicDBObject("username", username));
+            objDB.add(new BasicDBObject("password", password));
+            whereQuery.put("$and", objDB);
+          
+            System.out.println(whereQuery.toString());
+          
             DBCursor cursor = collection.find(whereQuery);
+            JSONObject returnJson = new JSONObject();
                 if(cursor.count() == 0) {
                     System.out.println("not found");
                     //status = true;
                     message = "Login unsuccess";
-                    json.put("status", status);
-                    json.put("message", message);
+                    returnJson.put("status", status);
+                    returnJson.put("message", message);
                     PrintWriter out = response.getWriter();
-                    out.print(json);
+                    out.print(returnJson);
                 
             }else {
                     while (cursor.hasNext()) {
                         BasicDBObject obj = (BasicDBObject) cursor.next();
                         token = obj.getString("token");
                     }
+                    
                     status = true;
                     message = "Login success";
-                    json.put("status", status);
-                    json.put("message", message);
-                    json.put("token", token);
+                    returnJson.put("username", username);
+                    returnJson.put("status", status);
+                    returnJson.put("message", message);
+                    returnJson.put("token", token);
                     PrintWriter out = response.getWriter();
-                    out.print(json);
+                    out.print(returnJson);
                 }
 
 

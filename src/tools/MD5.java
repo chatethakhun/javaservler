@@ -5,22 +5,44 @@
  */
 package tools;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  *
  * @author chate
  */
 public class MD5 {
-    public String MD5(String md5) {
-   try {
-        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-        byte[] array = md.digest(md5.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < array.length; ++i) {
-          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-       }
-        return sb.toString();
-    } catch (java.security.NoSuchAlgorithmException e) {
+    public String MD5(String md5)  {
+    	String password = md5;
+        MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("MD5");
+			 md.update(password.getBytes());
+
+		        byte byteData[] = md.digest();
+
+		        //convert the byte to hex format method 1
+		        StringBuffer sb = new StringBuffer();
+		        for (int i = 0; i < byteData.length; i++) {
+		         sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+		        }
+
+		        System.out.println("Digest(in hex format):: " + sb.toString());
+
+		        //convert the byte to hex format method 2
+		        StringBuffer hexString = new StringBuffer();
+		    	for (int i=0;i<byteData.length;i++) {
+		    		String hex=Integer.toHexString(0xff & byteData[i]);
+		   	     	if(hex.length()==1) hexString.append('0');
+		   	     	hexString.append(hex);
+		    	}
+		    	System.out.println("Digest(in hex format):: " + hexString.toString());
+	
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return password;
     }
-    return null;
-}
 }
