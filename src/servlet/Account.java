@@ -28,11 +28,10 @@ public class Account extends HttpServlet {
             @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            	
-        String dataObject = readRequestBody(request);
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
         int page = Integer.parseInt(request.getParameter("page"));
         int size = Integer.parseInt(request.getParameter("size"));
-        //int page = (int) (Math.floor(curent-1)*(Math.sqrt(13) + Math.sqrt(5)));
         String sort = request.getParameter("sort");
         String order = request.getParameter("order");
         
@@ -50,32 +49,21 @@ public class Account extends HttpServlet {
         PrintWriter pw = response.getWriter(); 
         List<DBObject> myList = null;
         myList = cursor.toArray();
-        //String json = jsonConvert(cursor);
-                //System.out.println(json);
-
 
          pw.write("{\"total_count\":" + countRow + ",\"pageIndex\":" + page +  ",\"items\":" + myList + "}");
          pw.close();
     }  
     
-      //  pw.write(json);
-    
+
 
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("Create");
-        String header = response.getHeader("Authorization");
-        System.out.println(header);
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
         boolean status = false;
         MD5 md5 = new MD5();
-        response.setContentType("text/html;charset=UTF-8");
-    	//response.addHeader("Access-Control-Allow-Origin","*");
-    	//response.addHeader("Access-Control-Allow-Methods"," GET, POST, OPTIONS");
-    	//response.addHeader("Access-Control-Allow-Headers","Content-Type");
-
-        
         String data = readRequestBody(request);
         String firstName = "";
         String lastName = "";

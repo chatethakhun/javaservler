@@ -72,6 +72,8 @@ public class Validate extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+            response.setContentType("text/html;charset=UTF-8");
+            request.setCharacterEncoding("UTF-8");
 
     }
 
@@ -86,6 +88,8 @@ public class Validate extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+            response.setContentType("text/html;charset=UTF-8");
+            request.setCharacterEncoding("UTF-8");
             String header = request.getHeader("Authorization");
             response.setContentType("application/json");
             boolean status = false;
@@ -94,10 +98,12 @@ public class Validate extends HttpServlet {
             BodyRequest getBody = new BodyRequest();
             String data = getBody.readRequestBody(request);
             System.out.println("Data is :" + data);
-        String username = "";
-        String password = "";
-        //String token = "";
-        
+            String username = "";
+            String password = "";
+            String name = "";
+            String lastname = "";
+
+
 
         
         try {
@@ -132,12 +138,15 @@ public class Validate extends HttpServlet {
                     while (cursor.hasNext()) {
                         BasicDBObject obj = (BasicDBObject) cursor.next();
                         token = obj.getString("token");
+                        name = obj.getString("firstName");
+                        lastname = obj.getString("lastName");
                     }
                     
                     status = true;
                     message = "Login success";
-                    returnJson.put("username", username);
                     returnJson.put("status", status);
+                    returnJson.put("name", name);
+                    returnJson.put("lastname", lastname);
                     returnJson.put("message", message);
                     returnJson.put("token", token);
                     PrintWriter out = response.getWriter();
